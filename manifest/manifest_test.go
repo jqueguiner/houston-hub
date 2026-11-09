@@ -364,23 +364,31 @@ func TestRedisDatabaseIndex(t *testing.T) {
 	}
 }
 
-func TestStatelessMetadata(t *testing.T) {
-	m := example(t, 2)
-	if m.Stateless {
-		t.Fatal("account connectors must not default to stateless")
-	}
-	m.Stateless = true
-	raw, err := json.Marshal(m)
-	if err != nil {
-		t.Fatal(err)
-	}
-	parsed, err := Parse(raw)
-	if err != nil || !parsed.Stateless {
-		t.Fatalf("stateless metadata lost: %v", err)
-	}
-	for _, invalid := range []string{`"true"`, `1`, `null`} {
-		if _, err := Parse([]byte(strings.Replace(string(raw), `"stateless":true`, `"stateless":`+invalid, 1))); err == nil {
-			t.Fatalf("accepted stateless=%s", invalid)
+func TestRootFlags(t *testing.T) {
+	for _, flag := range []struct {
+		name string
+		get  func(*Manifest) *bool
+	}{
+		{"stateless", func(m *Manifest) *bool { return &m.Stateless }},
+		{"personal", func(m *Manifest) *bool { return &m.Personal }},
+	} {
+		m := example(t, 2)
+		if *flag.get(m) {
+			t.Fatalf("%s must default to false", flag.name)
+		}
+		*flag.get(m) = true
+		raw, err := json.Marshal(m)
+		if err != nil {
+			t.Fatal(err)
+		}
+		parsed, err := Parse(raw)
+		if err != nil || !*flag.get(parsed) {
+			t.Fatalf("%s lost: %v", flag.name, err)
+		}
+		for _, invalid := range []string{`"true"`, `1`, `null`} {
+			if _, err := Parse([]byte(strings.Replace(string(raw), `"`+flag.name+`":true`, `"`+flag.name+`":`+invalid, 1))); err == nil {
+				t.Fatalf("accepted %s=%s", flag.name, invalid)
+			}
 		}
 	}
 }
@@ -409,5 +417,17 @@ func TestSharedCheckValidation(t *testing.T) {
 	}
 	if s := example(t, 3).Auth["oauth"].Shared; s == nil || s.Method != "POST" || s.Items != "/files" {
 		t.Fatalf("shared check not parsed: %+v", s)
+	}
+}
+
+func TestPersonalConnectorsAreNotStateless(t *testing.T) {
+	m := example(t, 2)
+	m.Personal, m.Stateless = true, true
+	raw, err := json.Marshal(m)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Parse(raw); err == nil || !strings.Contains(err.Error(), "personal connectors cannot be stateless") {
+		t.Fatalf("accepted a stateless personal connector: %v", err)
 	}
 }

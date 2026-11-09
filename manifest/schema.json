@@ -667,6 +667,10 @@
           "minLength": 1,
           "type": "string"
         },
+        "personal": {
+          "description": "Personal-only connector: Houston accepts only personal connections, used by the one person who connected them. Set it when the provider forbids sharing one person's authorization with other users.",
+          "type": "boolean"
+        },
         "proxy": {
           "items": {
             "$ref": "#/$defs/Proxy"

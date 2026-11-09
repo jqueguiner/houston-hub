@@ -17,6 +17,7 @@ type Manifest struct {
 	Setup           string                `json:"setup,omitempty"`
 	Warning         string                `json:"warning,omitempty"`
 	Stateless       bool                  `json:"stateless,omitempty"`
+	Personal        bool                  `json:"personal,omitempty"`
 	Icon            string                `json:"icon,omitempty"`
 	VerificationKey string                `json:"verification_key,omitempty"`
 	Files           []string              `json:"files"`

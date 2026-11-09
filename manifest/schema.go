@@ -85,6 +85,7 @@ func Schema() ([]byte, error) {
 	props("ProxyMatch")["colon_path_parameters"].(map[string]any)["description"] = "Placeholder names whose values may contain a colon, plain or percent-encoded, such as a URN; other placeholders, bare or before a {name}:verb suffix, refuse colons. Opaque parameters already accept colons and cannot be repeated here."
 	props("Manifest")["schema_version"] = map[string]any{"const": 1}
 	props("Manifest")["warning"].(map[string]any)["description"] = "Markdown notice shown prominently wherever people set up or review this connector, such as a pending provider approval that affects their experience."
+	props("Manifest")["personal"].(map[string]any)["description"] = "Personal-only connector: Houston accepts only personal connections, used by the one person who connected them. Set it when the provider forbids sharing one person's authorization with other users."
 	for _, nk := range [][2]string{{"Manifest", "files"}, {"Manifest", "proxy"}, {"Field", "options"}, {"ScopeGroup", "values"}, {"ProxyMatch", "host"}, {"ProxyMatch", "method"}, {"ProxyMatch", "path"}} {
 		props(nk[0])[nk[1]].(map[string]any)["minItems"] = 1
 	}

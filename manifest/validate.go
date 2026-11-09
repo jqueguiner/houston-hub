@@ -170,6 +170,9 @@ func (m *Manifest) Validate() error {
 	if m.Name == "" {
 		return fmt.Errorf("name is required")
 	}
+	if m.Personal && m.Stateless {
+		return fmt.Errorf("personal connectors cannot be stateless")
+	}
 	if m.Icon != "" && m.Icon != "icon.svg" && m.Icon != "icon.png" {
 		return fmt.Errorf("invalid icon")
 	}
